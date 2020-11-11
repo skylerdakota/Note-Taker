@@ -1,9 +1,9 @@
 # Note-Taker
 An application that can write, save, and delete notes. This application uses an express backend and saves and retrieves note data from a JSON file
 
-[Note Taker App](https://skylerdakota.github.io/Team-Roster-Generator/)
+[Note Taker App](https://skylerdakota.github.io/Note-Taker/)
 
-![Demo](Assets/roster.png)
+![Demo](public/assets/notes.png)
 
 #### Project Demonstration
 
