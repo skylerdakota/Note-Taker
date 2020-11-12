@@ -2,21 +2,34 @@
 // =============================================================
 var express = require("express");
 var path = require("path");
+var fs = require("fs");
+var notes = require("/db/db.json");
 
 // Sets up the Express App
 // =============================================================
 var app = express();
-var PORT = 3000;
+var PORT = process.envPORT || 3000;
 
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Routes
+
+// Notes (DATA)
+// =============================================================
+// var notes = [
+//     {
+//       id: "",
+//       title: "",
+//       content: "",
+//     }
+//   ];
+
+// HTML Routes
 // =============================================================
 
 // Basic route that sends the user first to the AJAX Page
-app.get("/", function(req, res) {
+app.get("/index", function(req, res) {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
@@ -24,42 +37,49 @@ app.get("/notes", function(req, res) {
   res.sendFile(path.join(__dirname, "notes.html"));
 });
 
-// Displays all reservations
-app.get("/api/reservations", function(req, res) {
-  return res.json(reservations);
+// If no matching route is found default to home
+app.get("*", function(req, res) {
+    res.sendFile(path.join(__dirname, "index.html"));
+  });
+
+// API Routes
+// =============================================================
+
+// Displays all notes
+app.get("/api/notes", function(req, res) {
+  return res.json(notes);
 });
 
-// Displays a single reservation, or returns false
-app.get("/api/bookings/:reservations", function(req, res) {
-  var chosen = req.params.reservations;
-
-  console.log(chosen);
-
-  for (var i = 0; i < bookings.length; i++) {
-    if (chosen === bookings[i].routeName) {
-      return res.json(bookings[i]);
-    }
-  }
-
-  return res.json(false);
-});
-
-// Create New Bookings - takes in JSON input
-app.post("/api/bookings", function(req, res) {
+// Create new note - takes in JSON input
+app.post("/api/notes", function(req, res) {
   // req.body hosts is equal to the JSON post sent from the user
   // This works because of our body parsing middleware
-  var newBooking = req.body;
+  var newNote = req.body;
 
   // Using a RegEx Pattern to remove spaces from newCharacter
   // You can read more about RegEx Patterns later https://www.regexbuddy.com/regex.html
-  newBooking.routeName = newBooking.name.replace(/\s+/g, "").toLowerCase();
+  newNote.id = newNote.title.replace(/\s+/g, "").toLowerCase();
 
-  console.log(newBooking);
+  console.log(newNote);
 
-  characters.push(newBooking);
+  notes.push(newNote);
 
-  res.json(newBooking);
+  res.json(newNote);
 });
+
+// Deletes a note
+app.delete("/api/notes/:id", function(req, res) {
+    var chosen = req.params.notes;
+  
+    console.log(chosen);
+  
+    for (var i = 0; i < notes.length; i++) {
+      if (chosen === notes[i].id) {
+        return res.json(notes[i]);
+      }
+    }
+    return res.json(false);
+  });
 
 // Starts the server to begin listening
 // =============================================================
