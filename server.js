@@ -46,7 +46,7 @@ app.get("/api/notes", function(req, res) {
 
 // Create new note - takes in JSON input
 app.post("/api/notes", function(req, res) {
-  //var newNote = { title, text, id: getId() }
+  var newNote = {}
   fs.readFile("./db/db.json", "utf8", function(err, data) {
     if (err) {
       console.log(err);
@@ -58,7 +58,7 @@ app.post("/api/notes", function(req, res) {
           console.log(err);
         } else {
         console.log("New note written")
-        res.json(newNote)
+        res.json(notePad)
         }
     })
     });
