@@ -3,7 +3,10 @@
 var express = require("express");
 var path = require("path");
 var fs = require("fs");
-var notes = require("/db/db.json");
+const getId = require("uuid/v1");
+// Notes (DATA) Dependency
+// =============================================================
+var notes = require("./db/db.json");
 
 // Sets up the Express App
 // =============================================================
@@ -13,17 +16,7 @@ var PORT = process.envPORT || 8080;
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-
-// Notes (DATA)
-// =============================================================
-// var notes = [
-//     {
-//       id: "",
-//       title: "",
-//       content: "",
-//     }
-//   ];
+app.use (express.static("public"));
 
 // HTML Routes
 // =============================================================
@@ -47,48 +40,41 @@ app.get("*", function(req, res) {
 
 // Displays all notes
 app.get("/api/notes", function(req, res) {
+    console.log(notes)
   return res.json(notes);
 });
 
 // Create new note - takes in JSON input
 app.post("/api/notes", function(req, res) {
-  // req.body hosts is equal to the JSON post sent from the user
-  // This works because of our body parsing middleware
-  var newNote = { id: getId(), ...req.body }
+  //var newNote = { title, text, id: getId() }
   fs.readFile("./db/db.json", "utf8", function(err, data) {
     if (err) {
       console.log(err);
     }
     const notePad = JSON.parse(data)
     notePad.push(newNote)
-    fs.writeFile("./db/db.json", JSON.stringify(note), function(err, data) {
+    fs.writeFile("./db/db.json", JSON.stringify(notes), function(err, data) {
         if (err) {
           console.log(err);
         } else {
         console.log("New note written")
-    }
-  });
-
-  // Using a RegEx Pattern to remove spaces from newCharacter
-  // You can read more about RegEx Patterns later https://www.regexbuddy.com/regex.html
-  newNote.id = newNote.title.replace(/\s+/g, "").toLowerCase();
-  console.log(newNote);
-  notes.push(newNote);
-  res.json(newNote);
+        res.json(newNote)
+        }
+    })
+    });
 });
 
 // Deletes a note
 app.delete("/api/notes/:id", function(req, res) {
-    var chosen = req.params.notes;
-  
-    console.log(chosen);
-  
+    // locate note by id to delete
+    var deleteNote = req.params.id;
+    console.log(deleteNote);
     for (var i = 0; i < notes.length; i++) {
-      if (chosen === notes[i].id) {
-        return res.json(notes[i]);
+      if (deleteNote === notes[i].id) {
+          notes.splice(i,1);
+          i--;
       }
     }
-    return res.json(false);
   });
 
 // Starts the server to begin listening
